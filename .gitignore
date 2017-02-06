@@ -1,0 +1,14 @@
+# UE4 Generated
+
+*/Binaries/
+*/Build/
+*/DerivedDataCache/
+*/Intermediate/
+*/Saved/
+BuildingEscape/Content/StarterContent/
+
+
+# VS Generated
+
+*.VC.db
+*.VC.opendb
