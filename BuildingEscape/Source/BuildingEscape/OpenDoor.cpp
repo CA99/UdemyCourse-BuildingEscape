@@ -20,19 +20,26 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Owner = GetOwner();
 	ActorThatOpens = GetWorld()->GetFirstPlayerController()->GetPawn();
+
+	DoorInitRot = Owner->GetTransform().GetRotation().Rotator();
+	DoorOpenRot = DoorInitRot;
+	DoorOpenRot = DoorOpenRot.Add(0.0f, OpenAngle, 0.0f);
+	//UE_LOG(LogTemp, Warning, TEXT("DoorInitRot: %s"), *DoorInitRot.ToString())
+	//UE_LOG(LogTemp, Warning, TEXT("DoorOpenRot: %s"), *DoorOpenRot.ToString())
+	//UE_LOG(LogTemp, Warning, TEXT("Test: %s"), *FRotator(0.0f,0.0f,0.0f).ToString())
+}
+
+void UOpenDoor::CloseDoor() {
+	Owner->SetActorRotation(DoorInitRot);
+	//UE_LOG(LogTemp, Warning, TEXT("Door Closed"))
 }
 
 void UOpenDoor::OpenDoor() {
-	AActor* Owner = GetOwner();
-
-	FString DoorRot = Owner->GetTransform().GetRotation().ToString();
-	UE_LOG(LogTemp, Warning, TEXT("Door Rotation %s"), *DoorRot);
-
-	FRotator NewRotation = FRotator(0.0f, OpenAngle, 0.0f);
-	Owner->SetActorRotation(NewRotation);
+	Owner->SetActorRotation(DoorOpenRot);
+	//UE_LOG(LogTemp, Warning, TEXT("Door Opened"))
 }
-
 
 // Called every frame
 void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
@@ -41,6 +48,10 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 
 	if (PressurePlate->IsOverlappingActor(ActorThatOpens))  {
 		OpenDoor();
+		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+	}
+	if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime >= DoorCloseDelay) {
+		CloseDoor();
+		//FString DoorRot = Owner->GetTransform().GetRotation().ToString();
 	}
 }
-
