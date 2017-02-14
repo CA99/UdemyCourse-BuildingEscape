@@ -22,14 +22,16 @@ public:
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
 private:
-	FVector PlayerViewPointLocation; // will pass into and be set by GetPlayerViewPoint()
-	FRotator PlayerViewPointRotation; // will pass into and be set by GetPlayerViewPoint()
-	float Reach = 100.0f;
+	FVector PlayerViewPointLocation; // Will pass into and be set by GetPlayerViewPoint()
+	FRotator PlayerViewPointRotation; // Will pass into and be set by GetPlayerViewPoint()
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 	UInputComponent* InputComponent = nullptr;
+	float Reach = 100.0f;
 	void Grab();
 	void Release();
 	void FindPhysicsHandleComponent();
 	void SetupInputComponent();
 	const FHitResult GetFirstPhysicsBodyInReach();
+	const FVector GetPlayerReachStartPoint();
+	const FVector GetPlayerReachEndPoint(); // WARNING: Will update PlayerViewPointLocation and PlayerViewPointRotation
 };
