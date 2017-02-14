@@ -9,8 +9,6 @@ UGrabber::UGrabber()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -19,8 +17,36 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Grabber Initiated"))
+	FindPhysicsHandleComponent();
 
+	SetupInputComponent();
+
+	//GetFirstPhysicsBodyInReach();
+}
+
+void UGrabber::Grab() {
+	UE_LOG(LogTemp, Warning, TEXT("Grab."))
+	// try to reach any actors with physics collision
+	auto Target = GetFirstPhysicsBodyInReach();
+	auto ComponentToGrab = Target.GetComponent();
+
+	if (Target.GetActor()) {
+		PhysicsHandle->GrabComponent( // attach physics handle
+			ComponentToGrab,
+			NAME_None,
+			ComponentToGrab->GetOwner()->GetActorLocation(),
+			true
+		);
+	}
+}
+
+void UGrabber::Release() {
+	UE_LOG(LogTemp, Warning, TEXT("Release."))
+	// TODO release physics handle
+	PhysicsHandle->ReleaseComponent();
+}
+
+void UGrabber::FindPhysicsHandleComponent() {
 	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 	if (PhysicsHandle) {
 		// handle is found
@@ -28,7 +54,9 @@ void UGrabber::BeginPlay()
 	else {
 		UE_LOG(LogTemp, Error, TEXT("Grabber for %s could not find the PhysicsHandle component."), *GetOwner()->GetName())
 	}
+}
 
+void UGrabber::SetupInputComponent() {
 	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
 	if (InputComponent) {
 		UE_LOG(LogTemp, Warning, TEXT("Grabber for %s has Input component."), *GetOwner()->GetName())
@@ -41,40 +69,28 @@ void UGrabber::BeginPlay()
 	}
 }
 
-void UGrabber::Grab() {
-	UE_LOG(LogTemp, Warning, TEXT("Grab."))
-}
-
-void UGrabber::Release() {
-	UE_LOG(LogTemp, Warning, TEXT("Release."))
-}
-
-// Called every frame
-void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
-{
-	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
-
+const FHitResult UGrabber::GetFirstPhysicsBodyInReach() {
 	// Get player viewpoint
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
 		PlayerViewPointLocation, // GetPlayerViewPoint() sets these vars to their values
 		PlayerViewPointRotation // GetPlayerViewPoint() sets these vars to their values
 	);
 	/*UE_LOG(LogTemp, Warning, TEXT("ViewPoint: Location: %s ; Position: %s"),
-		*PlayerViewPointLocation.ToString(),
-		*PlayerViewPointRotation.ToString()
+	*PlayerViewPointLocation.ToString(),
+	*PlayerViewPointRotation.ToString()
 	)*/
 
 	FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
-	DrawDebugLine(
-		GetWorld(),
-		PlayerViewPointLocation,
-		LineTraceEnd,
-		FColor(255, 255, 0),
-		false,
-		0.0f,
-		0.0f,
-		10.0f
-	);
+	/*DrawDebugLine(
+	GetWorld(),
+	PlayerViewPointLocation,
+	LineTraceEnd,
+	FColor(255, 255, 0),
+	false,
+	0.0f,
+	0.0f,
+	10.0f
+	);*/
 
 	// Setup query parameters
 	FCollisionQueryParams TraceParameters(
@@ -97,6 +113,27 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 		UE_LOG(LogTemp, Warning, TEXT("Target Hit: %s"), *(ActorHit->GetName()))
 	}
 
-	// Check collision
+	return Hit;
 }
 
+// Called every frame
+void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
+{
+	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
+	
+	// if physics handle attached
+	if (PhysicsHandle->GrabbedComponent) {
+		GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+			PlayerViewPointLocation, // GetPlayerViewPoint() sets these vars to their values
+			PlayerViewPointRotation // GetPlayerViewPoint() sets these vars to their values
+		);
+		/*UE_LOG(LogTemp, Warning, TEXT("ViewPoint: Location: %s ; Position: %s"),
+		*PlayerViewPointLocation.ToString(),
+		*PlayerViewPointRotation.ToString()
+		)*/
+
+		FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
+		// move object behind held
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	}
+}
