@@ -25,22 +25,23 @@ void UGrabber::BeginPlay()
 }
 
 void UGrabber::Grab() {
-	UE_LOG(LogTemp, Warning, TEXT("Grab."))
+	UE_LOG(LogTemp, Warning, TEXT("Grabbed."))
 	// try to reach any actors with physics collision
 	auto Target = GetFirstPhysicsBodyInReach();
 	auto ComponentToGrab = Target.GetComponent();
 
 	if (Target.GetActor()) {
-		PhysicsHandle->GrabComponentAtLocation(
+		PhysicsHandle->GrabComponentAtLocationWithRotation(
 			ComponentToGrab,
 			NAME_None, // no bones
-			ComponentToGrab->GetOwner()->GetActorLocation()
+			ComponentToGrab->GetOwner()->GetActorLocation(),
+			ComponentToGrab->GetOwner()->GetActorRotation()
 		);
 	}
 }
 
 void UGrabber::Release() {
-	UE_LOG(LogTemp, Warning, TEXT("Release."))
+	UE_LOG(LogTemp, Warning, TEXT("Released."))
 	// TODO release physics handle
 	PhysicsHandle->ReleaseComponent();
 }

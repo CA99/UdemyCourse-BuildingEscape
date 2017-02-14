@@ -26,7 +26,7 @@ private:
 	FRotator PlayerViewPointRotation; // Will pass into and be set by GetPlayerViewPoint()
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 	UInputComponent* InputComponent = nullptr;
-	float Reach = 100.0f;
+	float Reach = 150.0f;
 	void Grab();
 	void Release();
 	void FindPhysicsHandleComponent();
