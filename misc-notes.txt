@@ -1,0 +1,9 @@
+How to revert:
+- Git Checkout/Git Reset to previous working state.
+- Delete Generated Files/Dirs: Del All Except:
+ > Config/
+ > Content/
+ > Source/
+ > *.uproject
+- Reopen UE4 to *.uproject
+- Generate IDE Prj Files

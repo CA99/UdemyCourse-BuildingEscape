@@ -24,5 +24,9 @@ public:
 private:
 	FVector PlayerViewPointLocation; // will pass into and be set by GetPlayerViewPoint()
 	FRotator PlayerViewPointRotation; // will pass into and be set by GetPlayerViewPoint()
-	float Reach;
+	float Reach = 100.0f;
+	UPhysicsHandleComponent* PhysicsHandle = nullptr;
+	UInputComponent* InputComponent = nullptr;
+	void Grab();
+	void Release();
 };
