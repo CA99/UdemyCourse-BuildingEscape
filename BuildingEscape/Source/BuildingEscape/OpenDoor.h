@@ -35,8 +35,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float DoorCloseDelay = 0.5f;
 
-	//AActor* ActorThatOpens;
-
 	UPROPERTY(EditAnywhere)
 	float TriggerMass = 35.0f;
 

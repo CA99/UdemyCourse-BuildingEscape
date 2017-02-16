@@ -31,6 +31,7 @@ void UGrabber::Grab() {
 	auto ComponentToGrab = Target.GetComponent();
 
 	if (Target.GetActor()) {
+		if (!PhysicsHandle) { return; }
 		PhysicsHandle->GrabComponentAtLocationWithRotation(
 			ComponentToGrab,
 			NAME_None, // no bones
@@ -43,25 +44,28 @@ void UGrabber::Grab() {
 void UGrabber::Release() {
 	UE_LOG(LogTemp, Warning, TEXT("Released."))
 	// TODO release physics handle
+	if (!PhysicsHandle) { return; }
 	PhysicsHandle->ReleaseComponent();
 }
 
 void UGrabber::FindPhysicsHandleComponent() {
-	PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if (PhysicsHandle == nullptr) {
-		UE_LOG(LogTemp, Error, TEXT("Grabber for %s could not find the PhysicsHandle component."), *GetOwner()->GetName())
+	if (GetOwner()->FindComponentByClass<UPhysicsHandleComponent>()) {
+		PhysicsHandle = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Grabber component for %s could not find the PhysicsHandle component."), *GetOwner()->GetName())
 	}
 }
 
 void UGrabber::SetupInputComponent() {
 	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
 	if (InputComponent) {
-		UE_LOG(LogTemp, Warning, TEXT("Grabber for %s has Input component."), *GetOwner()->GetName())
+		UE_LOG(LogTemp, Warning, TEXT("Grabber component for %s has Input component."), *GetOwner()->GetName())
 		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
 		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
 	}
 	else {
-		UE_LOG(LogTemp, Error, TEXT("Grabber for %s could not find the Input component."), *GetOwner()->GetName())
+		UE_LOG(LogTemp, Error, TEXT("Grabber component for %s could not find the Input component."), *GetOwner()->GetName())
 	}
 }
 

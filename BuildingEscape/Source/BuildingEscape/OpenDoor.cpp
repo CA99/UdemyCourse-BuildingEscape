@@ -10,8 +10,6 @@ UOpenDoor::UOpenDoor()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
@@ -29,6 +27,9 @@ void UOpenDoor::BeginPlay()
 	//UE_LOG(LogTemp, Warning, TEXT("DoorInitRot: %s"), *DoorInitRot.ToString())
 	//UE_LOG(LogTemp, Warning, TEXT("DoorOpenRot: %s"), *DoorOpenRot.ToString())
 	//UE_LOG(LogTemp, Warning, TEXT("Test: %s"), *FRotator(0.0f,0.0f,0.0f).ToString())
+	if (!PressurePlate) {
+		UE_LOG(LogTemp, Error, TEXT("OpenDoor component for %s could not find a PressurePlate."), *GetOwner()->GetName())
+	}
 }
 
 void UOpenDoor::CloseDoor() {
@@ -46,12 +47,15 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate() {
 
 	// find all overlapping actors
 	TArray<AActor*> OverlappingActors;
-	PressurePlate->GetOverlappingActors(OverlappingActors); // Sets OverlappingActors as OUT parameter
-		// iterate thru actors and add their masses
-	float ActorMass = 0.0f;
-	for (auto& Actor : OverlappingActors) {
-		TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
-		UE_LOG(LogTemp, Warning, TEXT("Total Mass: %s"), *Actor->GetName())
+
+	if (PressurePlate) {
+		PressurePlate->GetOverlappingActors(OverlappingActors); // Sets OverlappingActors as OUT parameter
+																// iterate thru actors and add their masses
+		float ActorMass = 0.0f;
+		for (auto& Actor : OverlappingActors) {
+			TotalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+			UE_LOG(LogTemp, Warning, TEXT("Total Mass: %s"), *Actor->GetName())
+		}
 	}
 	return TotalMass;
 }
@@ -67,6 +71,5 @@ void UOpenDoor::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompo
 	}
 	if (GetWorld()->GetTimeSeconds() - LastDoorOpenTime >= DoorCloseDelay) {
 		CloseDoor();
-		//FString DoorRot = Owner->GetTransform().GetRotation().ToString();
 	}
 }
