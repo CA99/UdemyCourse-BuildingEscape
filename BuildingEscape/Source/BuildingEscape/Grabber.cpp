@@ -102,8 +102,17 @@ const FVector UGrabber::GetPlayerReachEndPoint() { // WARNING: Will update Playe
 		PlayerViewPointLocation, // GetPlayerViewPoint() sets these vars to their values
 		PlayerViewPointRotation // GetPlayerViewPoint() sets these vars to their values
 	);
-	FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * Reach);
+	FVector LineTraceEnd = PlayerViewPointLocation + (PlayerViewPointRotation.Vector() * HoldDistance);
 	return LineTraceEnd;
+}
+
+const FRotator UGrabber::GetPlayerRotation() { // WARNING: Will update PlayerViewPointLocation and PlayerViewPointRotation
+													 // Get player viewpoint
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		PlayerViewPointLocation, // GetPlayerViewPoint() sets these vars to their values
+		PlayerViewPointRotation // GetPlayerViewPoint() sets these vars to their values
+	);
+	return PlayerViewPointRotation;
 }
 
 // Called every frame
@@ -115,5 +124,8 @@ void UGrabber::TickComponent( float DeltaTime, ELevelTick TickType, FActorCompon
 	// if physics handle attached
 	if (PhysicsHandle->GrabbedComponent) {
 		PhysicsHandle->SetTargetLocation(GetPlayerReachEndPoint());
+		if (FollowPlayerRotation) {
+			PhysicsHandle->SetTargetRotation(GetPlayerRotation());
+		}
 	}
 }

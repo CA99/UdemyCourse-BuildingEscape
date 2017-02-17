@@ -26,12 +26,22 @@ private:
 	FRotator PlayerViewPointRotation; // Will pass into and be set by GetPlayerViewPoint()
 	UPhysicsHandleComponent* PhysicsHandle = nullptr;
 	UInputComponent* InputComponent = nullptr;
-	float Reach = 150.0f;
+
+	UPROPERTY(EditAnywhere)
+	float Reach = 200.0f;
+
+	UPROPERTY(EditAnywhere)
+	float HoldDistance = 100.0f;
+
+	UPROPERTY(EditAnywhere)
+	bool FollowPlayerRotation = true;
+
 	void Grab();
 	void Release();
 	void FindPhysicsHandleComponent();
 	void SetupInputComponent();
 	const FHitResult GetFirstPhysicsBodyInReach();
 	const FVector GetPlayerReachStartPoint();
-	const FVector GetPlayerReachEndPoint(); // WARNING: Will update PlayerViewPointLocation and PlayerViewPointRotation
+	const FVector GetPlayerReachEndPoint();
+	const FRotator GetPlayerRotation(); // WARNING: Will update PlayerViewPointLocation and PlayerViewPointRotation
 };
