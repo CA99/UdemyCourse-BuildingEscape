@@ -1,0 +1,15 @@
+BuildingEscape: Escape the building game: Use your surroundings to figure out how to escape!
+
+Playtest 1 Notes:
+- Fix player gravity.
+- Fix ceiling clipping.
+- Improve lighting in basement:
+ > Add light to rock-covered pressure plate.
+ > Add lights to hallway.
+ > Add sparse guidance lighting to labyrinth.
+ > Dynamic grab object distance!
+
+Current updates list:
+- Start screen
+- Basic in-game UI
+- Escape ending
